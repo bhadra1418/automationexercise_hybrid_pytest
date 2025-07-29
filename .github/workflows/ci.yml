@@ -1,4 +1,4 @@
-name: Run Pytest Automation
+name: Run Pytest Automation on Multiple OS
 
 on:
   push:
@@ -8,7 +8,11 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout Code
@@ -24,6 +28,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Add PYTHONPATH to support relative imports
+      - name: Set PYTHONPATH
+        if: runner.os != 'Windows'
+        run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
+      - name: Set PYTHONPATH (Windows)
+        if: runner.os == 'Windows'
+        run: echo "PYTHONPATH=${{ github.workspace }}" >> $env:GITHUB_ENV
+
       - name: Run Tests and Generate HTML Report
         run: |
           pytest --html=reports/pytest-html-report.html
@@ -31,6 +44,5 @@ jobs:
       - name: Upload Pytest HTML Report
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-html-report
+          name: pytest-html-report-${{ runner.os }}
           path: reports/pytest-html-report.html
-
