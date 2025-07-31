@@ -1,0 +1,19 @@
+# azure-pipelines.yml
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.8'
+
+  - script: pip install -r requirements.txt
+    displayName: 'Install dependencies'
+
+  - script: pytest
+    displayName: 'Run tests'
