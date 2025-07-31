@@ -5,7 +5,7 @@ trigger:
       - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'selfpool'
 
 steps:
   - task: UsePythonVersion@0
